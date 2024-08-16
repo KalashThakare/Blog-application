@@ -11,11 +11,11 @@ app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
 
-app.get("/Posts",async(req,res)=>{
+app.get("/blog",async(req,res)=>{
     try {
-        const response=await axios.get(`${API_URL}/posts`);
+        const response=await axios.get(`${API_URL}/blog/posts`);
         console.log(response);
-        res.render("index.ejs",{ posts:response.data});
+        res.render("blogedit.ejs",{ posts:response.data});
         
     } catch (error) {
         res.status(404).json({message:"Error fetching posts"});
@@ -24,7 +24,7 @@ app.get("/Posts",async(req,res)=>{
 });
 
 app.get("/new",(req,res)=>{
-    res.render("index.ejs",{heading:"New Post", submit:"Create Posts" });
+    res.render("blogedit.ejs",{heading:"New Post", submit:"Create Posts" });
 
 });
 
@@ -32,7 +32,7 @@ app.get("/edit/:id",async(req,res)=>{
     try {
         const response=await axios.get(`${API_URL}/posts/${req.params.id}`);
         console.log(response.data);
-        res.render("/index.ejs",{
+        res.render("/blogedit.ejs",{
             post:response.data,
         });
     } catch (error) {
@@ -43,8 +43,8 @@ app.get("/edit/:id",async(req,res)=>{
 app.post("/api/posts",async(req,res)=>{
     try {
         const response=await axios.post(`${API_URL}/posts`,req.body);
-        console.log(response);
-        res.redirect("/Posts");
+        console.log(response.data);
+        res.redirect("/blog");
         
     } catch (error) {
         res.status(500).json({message:"Error creating a post"});
@@ -57,7 +57,7 @@ app.post("/api/posts/:id",async(req,res)=>{
     try {
         const response=await axios.patch(`${API_URL}/posts/${req.params.id}`,req.body);
         console.log(response.data);
-        res.redirect("/Posts");
+        res.redirect("/blog");
 
     } catch (error) {
         res.status(500).json({message:"Error updating the post"});
@@ -68,7 +68,7 @@ app.post("/api/posts/:id",async(req,res)=>{
 app.delete("/api/posts/delete/:id",async(req,res)=>{
     try {
         await axios.delete(`${API_URL}/posts/${req.params.id}`);
-        res.redirect("/Posts");
+        res.redirect("/blog");
     } catch (error) {
         res.status(500).json({message:"Error deleting the post"});
     }
