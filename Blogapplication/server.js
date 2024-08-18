@@ -2,79 +2,115 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import axios from 'axios';
 
+const app = express();
+const port = 3000;
 
-const port=3000;
-const app=express();
-const API_URL="http://localhost:4000";
+let posts = [
+];
+let lastId = 0;
 
 app.use(express.static("public"));
-app.use(bodyParser.urlencoded({extended:true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-app.get("/blog",async(req,res)=>{
-    try {
-        const response=await axios.get(`${API_URL}/posts`);
-        console.log(response);
-        res.render("blogedit.ejs",{ posts:response.data});
-        
-    } catch (error) {
-        res.status(404).json({message:"Error fetching posts"});
-        
-    }
+// Routes for handling the blog posts (API)
+app.get("/", (req, res) => {
+    res.render("index.ejs");
 });
 
-app.get("/new",(req,res)=>{
-    res.render("blogedit.ejs",{heading:"New Post", submit:"Create Posts" });
-
+app.get("/posts", (req, res) => {
+    console.log(posts);
+    res.json(posts);
 });
 
-app.get("/edit/:id",async(req,res)=>{
-    try {
-        const response=await axios.get(`${API_URL}/posts/${req.params.id}`);
-        console.log(response.data);
-        res.render("/blogedit.ejs",{
-            post:response.data,
-        });
-    } catch (error) {
-        res.status(500).json({message:"Error fetching post"})
-    }
+app.get("/blog/posts/:id", (req, res) => {
+    const post = posts.find((p) => p.id === parseInt(req.params.id));
+    if (!post) return res.status(404).json({ message: "Post not found" });
+    res.json(post);
 });
 
-app.post("/api/posts",async(req,res)=>{
-    try {
-        const response=await axios.post(`${API_URL}/posts`,req.body);
-        console.log(response.data);
-        res.redirect("/blog");
-        
-    } catch (error) {
-        res.status(500).json({message:"Error creating a post"});
-        
-    }
+app.post("/blog/posts", (req, res) => {
+    const newId = ++lastId;
+    const post = {
+        id: newId,
+        title: req.body.title,
+        content: req.body.content,
+        author: req.body.author,
+        date: new Date(),
+    };
+    posts.push(post);
+    res.status(201).json(post);
 });
 
-app.post("/api/posts/:id",async(req,res)=>{
-    console.log("called");
-    try {
-        const response=await axios.patch(`${API_URL}/posts/${req.params.id}`,req.body);
-        console.log(response.data);
-        res.redirect("/blog");
+app.patch("/blog/posts/:id", (req, res) => {
+    const post = posts.find((p) => p.id === parseInt(req.params.id));
+    if (!post) return res.status(404).json({ message: "Post not found" });
 
-    } catch (error) {
-        res.status(500).json({message:"Error updating the post"});
-        
-    }
+    if (req.body.title) post.title = req.body.title;
+    if (req.body.content) post.content = req.body.content;
+    if (req.body.author) post.author = req.body.author;
+
+    res.json(post);
 });
 
-app.delete("/api/posts/delete/:id",async(req,res)=>{
-    try {
-        await axios.delete(`${API_URL}/posts/${req.params.id}`);
-        res.redirect("/blog");
-    } catch (error) {
-        res.status(500).json({message:"Error deleting the post"});
-    }
+app.delete("/blog/posts/:id", (req, res) => {
+    const index = posts.findIndex((p) => p.id === parseInt(req.params.id));
+    if (index === -1) return res.status(404).json({ message: "Post not found" });
+
+    posts.splice(index, 1);
+    res.json({ message: "Post deleted" });
 });
 
-app.listen(port,()=>{
-    console.log(`Backend server is running on http://localhost:${port}`);
+// Routes for rendering the blog UI
+app.get("/blog", (req, res) => {
+    console.log(posts);
+    res.render("blogedit.ejs", { posts });
 });
 
+app.get("/new", (req, res) => {
+    res.render("newblog.ejs", { heading: "New Post", submit: "Create Post" });
+});
+
+
+app.get("/edit/:id", (req, res) => {
+    const post = posts.find((p) => p.id === parseInt(req.params.id));
+    if (!post) return res.status(404).json({ message: "Post not found" });
+    res.render("blogedit.ejs", { post });
+});
+
+
+app.post("/api/posts", (req, res) => {
+    const newId = ++lastId;
+    const post = {
+        id: newId,
+        title: req.body.title,
+        content: req.body.content,
+        author: req.body.author,
+        date: new Date(),
+    };
+    posts.push(post);
+    res.redirect("/blog");
+});
+
+app.post("/api/posts/:id", (req, res) => {
+    const post = posts.find((p) => p.id === parseInt(req.params.id));
+    if (!post) return res.status(404).json({ message: "Post not found" });
+
+    if (req.body.title) post.title = req.body.title;
+    if (req.body.content) post.content = req.body.content;
+    if (req.body.author) post.author = req.body.author;
+
+    res.redirect("/blog");
+});
+
+app.delete("/api/posts/delete/:id", (req, res) => {
+    const index = posts.findIndex((p) => p.id === parseInt(req.params.id));
+    if (index === -1) return res.status(404).json({ message: "Post not found" });
+
+    posts.splice(index, 1);
+    res.redirect("/blog");
+});
+
+app.listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`);
+});
