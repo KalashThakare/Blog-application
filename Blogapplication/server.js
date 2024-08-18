@@ -13,7 +13,7 @@ app.use(bodyParser.json());
 
 app.get("/blog",async(req,res)=>{
     try {
-        const response=await axios.get(`${API_URL}/blog/posts`);
+        const response=await axios.get(`${API_URL}/posts`);
         console.log(response);
         res.render("blogedit.ejs",{ posts:response.data});
         

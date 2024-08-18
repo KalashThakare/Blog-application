@@ -18,8 +18,8 @@ app.get("/",(req,res)=>{
     res.render("index.ejs");
 });
 
-app.get("/blog",(req,res)=>{
-    res.render("blogedit.ejs");
+app.get("/posts",(req,res)=>{
+    
     console.log(posts);
     res.json(posts);
 });
