@@ -7,9 +7,15 @@
     <link rel="stylesheet" href="/styles/YourPosts.css">
 </head>
 <body>
+    <h1>My Blog</h1>
     <div class="Container">
-        <h1>My Blog</h1>
-        <a id="newPostbtn" href="/new"></a>
+        <div class="new">
+            <button class="newbtn">
+                <a id="newPostbtn" href="/new">New</a>
+            </button>
+            
+        </div>
+        
         <ul id="postlist">
             <%if (locals.posts){%>
                 <%posts.forEach(post=>{%>

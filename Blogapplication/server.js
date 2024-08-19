@@ -75,7 +75,7 @@ app.get("/new", (req, res) => {
 app.get("/edit/:id", (req, res) => {
     const post = posts.find((p) => p.id === parseInt(req.params.id));
     if (!post) return res.status(404).json({ message: "Post not found" });
-    res.render("blogedit.ejs", { post });
+    res.render("Posts.ejs");
 });
 
 

@@ -1,0 +1,34 @@
+h1{
+    font-weight: bold;
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    text-align: center;
+}
+
+body{
+    background-color: aliceblue;
+}
+
+.title{
+    display: flex;
+    justify-content: center;
+    padding: 100px 0px 50px;
+    height: 50px;
+    
+}
+
+.content{
+    display: flex;
+    justify-content: center;
+    padding-bottom:20px;
+}
+
+.author{
+    display: flex;
+    justify-content: center;
+    padding-bottom: 10px;
+}
+
+.submit{
+    display: flex;
+    justify-content: center;
+}
